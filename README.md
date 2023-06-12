@@ -253,7 +253,7 @@ class NeuralNetwork {
 ````
 
 The model itself consists of one input layer with 4 nodes, a hidden layer with 6 nodes (in this case) and an output layer with 3 nodes.
-The input data is normalized to values between 0 and 1 before being predicted because, in theory, it is better for evolving. At every moment, the agent analyses the environment and acts accordingly. In order to see his decision process, I developed a function to visually the neural network and its weights:
+The input data is normalized to values between 0 and 1 before being predicted because, in theory, it is better for evolving. At every moment, the agent analyses the environment and acts accordingly. Regarding the activation functions for each layer, it is used ReLU from the hidden layer to output layer, which is then transformed to a probability distribuition as an output using the softmax function. In order to see this decision process, I developed a function to visualize the neural network and its weights:
 
 ![image](https://github.com/alexaoliveira2000/genetic-mario/assets/77057098/333b0def-90a1-4e9a-a8ed-b004918d6ecc)
 
