@@ -326,8 +326,9 @@ let updateModel = function(canvas, context, model, prediction, inputs) {
 }
 ````
 
+https://github.com/alexaoliveira2000/genetic-mario/assets/77057098/a2447e50-34dc-4c47-b2ca-f219730c7d86
 
-https://github.com/alexaoliveira2000/genetic-mario/assets/77057098/7cfb73ed-2e23-4670-96ce-54a1f99ae213
+
 
 
 
