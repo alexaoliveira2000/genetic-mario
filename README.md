@@ -163,4 +163,100 @@ The brain of the agent is this neural network. It consists of a class that imple
 
 Briefly analysing the game and all the information it provides, I think there's about 4 relevant informations we must give the agent - the visual properties of the next obstacle: x, y, width and height. If the game sped up through time, we probably would have to feed the speed of the obstacle aswell.
 
+```` js
+class NeuralNetwork {
+    constructor(inputs, hiddenUnits, outputs, model = {}) {
+        this.input_nodes = inputs;
+        this.hidden_nodes = hiddenUnits;
+        this.output_nodes = outputs;
+
+        if (model instanceof tf.Sequential) {
+            this.model = model;
+
+        } else {
+            this.model = this.createModel();
+        }
+    }
+
+    // Copy a model
+    copy() {
+        return tf.tidy(() => {
+            const modelCopy = this.createModel();
+            const weights = this.model.getWeights();
+            const weightCopies = [];
+            for (let i = 0; i < weights.length; i++) {
+                weightCopies[i] = weights[i].clone();
+            }
+            modelCopy.setWeights(weightCopies);
+            return new NeuralNetwork(this.input_nodes, this.hidden_nodes, this.output_nodes, modelCopy);
+        });
+    }
+
+    randomGaussian() {
+        let mean = 0;
+        let stdDev = 1;
+
+        let u = 0, v = 0;
+        while (u === 0) u = Math.random();
+        while (v === 0) v = Math.random();
+        let num = Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
+        return num * stdDev + mean;
+    }
+
+    mutate(rate) {
+        tf.tidy(() => {
+            const weights = this.model.getWeights();
+            const mutatedWeights = [];
+            for (let i = 0; i < weights.length; i++) {
+                let tensor = weights[i];
+                let shape = weights[i].shape;
+                let values = tensor.dataSync().slice();
+                for (let j = 0; j < values.length; j++) {
+                    if (Math.random(1) < rate) {
+                        let w = values[j];
+                        values[j] = w + this.randomGaussian();
+                    }
+                }
+                let newTensor = tf.tensor(values, shape);
+                mutatedWeights[i] = newTensor;
+            }
+            this.model.setWeights(mutatedWeights);
+        });
+    }
+
+    predict(inputs) {
+        return tf.tidy(() => {
+            const xs = tf.tensor2d([inputs]);
+            const ys = this.model.predict(xs);
+            const output = ys.dataSync();
+            return output;
+        });
+    }
+
+    createModel() {
+        const model = tf.sequential();
+        const hiddenLayer = tf.layers.dense({
+            units: this.hidden_nodes,
+            inputShape: [this.input_nodes],
+            activation: "relu"
+        });
+        model.add(hiddenLayer);
+        const outputLayer = tf.layers.dense({
+            units: this.output_nodes,
+            activation: "softmax"
+        });
+        model.add(outputLayer);
+        return model;
+    }
+}
+````
+
+The model itself consists of one input layer with 4 nodes, a hidden layer with 6 nodes (in this case) and an output layer with 3 nodes.
+The input data is normalized to values between 0 and 1 before being predicted because, in theory, it is better for evolving. At every moment, the agent analyses the environment and acts accordingly. In order to see his decision process, I developed a function to visually the neural network and its weights:
+![image](https://github.com/alexaoliveira2000/genetic-mario/assets/77057098/333b0def-90a1-4e9a-a8ed-b004918d6ecc)
+
+Thicker lines represent bigger impact on the agent's final decision.
+
+
+
 
