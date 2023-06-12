@@ -39,7 +39,7 @@ class Item {
 }
 ````
 
-The agent, however, is a bit different. It must have additional methods, such as the brain (neural network), all the actions (stand, jump and crouch), its score and collisions validation:
+The agent, however, is a bit different. It must have additional methods, such as the brain (neural network), all the actions (stand, jump and crouch), its score and collisions validation (some of the things related to NNs are explained further ahead):
 ```` js
 class Agent extends Item {
     constructor(context, x, y, width, height, color, brain) {
@@ -115,6 +115,48 @@ class Agent extends Item {
     }
 }
 ````
+
+As for the obstacles (black rectangles), they are put on an array - you can call it a queue. This queue always has 3 obstacles. Each time a block reaches the end of the screen (left side), it is removed from the queue (and also the screen) and a new one is generated and put on the end of the queue. Here are the types of objects that can be generated:
+```` js
+let obstacleTypes = [
+        { y: 300, width: 50, height: 100 },
+        { y: 350, width: 50, height: 50 },
+        { y: 0, width: 50, height: 280 },
+        { y: 0, width: 50, height: 330 }
+    ]
+````
+We can, at any time, add more types of obstacles as so to make the game a little bit harder. Here's the logic of obstacles generation:
+```` js
+// initially, put 3 random obstacles on the queue
+let obstacles = [];
+for (let i = 0; i < 3; i++) {
+    let obstacleType = obstacleTypes[Math.floor(Math.random() * obstacleTypes.length)];
+    let obstacle = new Item(context, x, obstacleType.y, obstacleType.width, obstacleType.height, "black");
+    obstacles.push(obstacle);
+    obstacle.show();
+    x += 500
+}
+
+// while the agent hasn't hit an obstacle
+while (obstacles.every(obstacle => !agent.collided(obstacle))) {
+    // if the most left object is out of screen, remove it (shift) and add a new one at the end of the queue (push)
+    if (obstacles[0].x + obstacles[0].width < 0) {
+        obstacles.shift()
+        let obstacleType = obstacleTypes[Math.floor(Math.random() * obstacleTypes.length)];
+        let obstacle = new Item(context, 1400, obstacleType.y, obstacleType.width, obstacleType.height, "black");
+        obstacles.push(obstacle)
+        points++;
+        score.textContent = "Score: " + points;
+        agent.score++;
+     }
+     // move all objects at a given speed (-2 in this case)
+     for (const obstacle of obstacles) {
+        obstacle.move(-2, 0);
+     }
+}
+````
+
+
 
 
 All the environment logic was implemented by me, including all collisions and the gravity on each jump. 
