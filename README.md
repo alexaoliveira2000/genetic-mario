@@ -156,7 +156,11 @@ while (obstacles.every(obstacle => !agent.collided(obstacle))) {
 }
 ````
 
+This is the main code of the game. The remainder is irrelevant to talk about it here (buttons and refresh information on screen).
+
+## The Neural Network
+The brain of the agent is this neural network. It consists of a class that implements a dense neural network and performs some operations related to it. The input layer can be seen as each information that the agent receives, and the output layer all the available actions. The hidden layer can have any number of nodes as we'd like (tipically, if the NN has one hidden layer, x inputs and y outputs, it is recommended that we start with (x+y)/2 nodes in the hidden layer).
+
+Briefly analysing the game and all the information it provides, I think there's about 4 relevant informations we must give the agent - the visual properties of the next obstacle: x, y, width and height. If the game sped up through time, we probably would have to feed the speed of the obstacle aswell.
 
 
-
-All the environment logic was implemented by me, including all collisions and the gravity on each jump. 
