@@ -1,0 +1,32 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Environment</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.0.0/dist/tf.min.js"></script>
+    <script type="module" src="/script.js"></script>
+</head>
+<body>
+    <div style="width: 1000px; padding: 10px;">
+        <div style="display: flex; justify-content: center">
+            <span id="score" style="font-size: 20px; margin: 20px;">Score: 0</span>
+            <span id="generation" style="font-size: 20px; margin: 20px;">Generation: 0</span>
+            <span id="agent" style="font-size: 20px; margin: 20px;">Agent: 0</span>
+        </div>
+    </div>
+    <div>
+        <canvas id="canvas" width="1000" height="500" style="padding-bottom: 10px"></canvas>
+        <canvas id="model" width="800" height="700"></canvas>
+    </div>
+    <div style="display: inline-flex; width: 1000px">
+        <div>
+            <div>
+                <button id="start">Start</button>
+                <button id="reset">Reset</button>
+                <button id="train">Train</button>
+            </div>
+            <div id="train_table" style="display: inline-flex;"></div>
+        </div>
+    </div>
+</body>
+</html>
