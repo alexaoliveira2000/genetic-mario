@@ -326,7 +326,10 @@ let updateModel = function(canvas, context, model, prediction, inputs) {
 }
 ````
 
-![Untitled video - Made with Clipchamp](https://github.com/alexaoliveira2000/genetic-mario/assets/77057098/1713e73b-baec-4b16-857e-1cb08be9f112)
+
+https://github.com/alexaoliveira2000/genetic-mario/assets/77057098/7cfb73ed-2e23-4670-96ce-54a1f99ae213
+
+
 
 
 
