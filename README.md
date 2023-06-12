@@ -9,6 +9,7 @@ Before we start, in this document I use some terminology that is specific for Ge
 I wanted to make a simple game (like an arcade game), where the actions we can make are very limited, aswell as the information we analyse as players. I ended up with thinking Super Mario, but with the difference that the agent cannot walk sideways, which means that the only available options are to *stand*, *jump* and *crouch*.
 
 I do not worry about the aspect of this game, just the mechanics, and so all you're going to see in the game are rectangles:
+
 ![image](https://github.com/alexaoliveira2000/genetic-mario/assets/77057098/f3e941af-93ac-4f23-acfa-7cc71a3ad169)
 
 You probably understand it at first glance, but the red rectangle represents the agent, the green one is the floor and the black one is the obstacle. All obstacles are generated randomly, so that the agent doesn't learn patterns that are specific of the path - just useful patterns that can adapt to any map generation. As for the score, each time the agent gets through an obstacle, the score goes up by 2 points, and each time he "almost" goes through the block (doesn't hit it on the left side, but above or below), 1 point is incremented to the score - as a way of indicating that that was almost the correct action. The game ends when the agent reaches a score of 100 (gets through 50 blocks), or when the agent collides with an object.
@@ -253,10 +254,77 @@ class NeuralNetwork {
 
 The model itself consists of one input layer with 4 nodes, a hidden layer with 6 nodes (in this case) and an output layer with 3 nodes.
 The input data is normalized to values between 0 and 1 before being predicted because, in theory, it is better for evolving. At every moment, the agent analyses the environment and acts accordingly. In order to see his decision process, I developed a function to visually the neural network and its weights:
+
 ![image](https://github.com/alexaoliveira2000/genetic-mario/assets/77057098/333b0def-90a1-4e9a-a8ed-b004918d6ecc)
 
-Thicker lines represent bigger impact on the agent's final decision.
+Thicker lines represent bigger impact on the agent's final decision. The thickness of every weight from the input layer to the hidden layer is the sum of the current weight in the model and the input value, while the thickness of every weight from the hidden layer to the output layer is the sum of the current weight in the model and the prediction value.
 
+```` js
+let updateModel = function(canvas, context, model, prediction, inputs) {
+
+    context.clearRect(0, 0, canvas.width, canvas.height);
+
+    let layerWeights = model.getWeights().filter(weights => weights.name.includes("kernel"));
+    let inputWeights = layerWeights[0].arraySync();
+    let outputWeights = layerWeights[1].arraySync();
+
+    let layer1y = 170;
+    let layer2y = 275 - 25 * outputWeights.length;
+    let layer3y = 200;
+
+    let outputLabels = ["stand", "jump", "crouch"];
+
+    // input nodes
+    for (let i = 1; i <= 4; i++) {
+        context.beginPath();
+        context.arc(100, layer1y + 50*i, 10, 0, 2 * Math.PI);
+        context.fillStyle = "blue";
+        context.fill();
+        context.closePath();
+        // weights from input layer to hidden layer
+        for (let j = 1; j <= outputWeights.length; j++) {
+            context.beginPath();
+            context.moveTo(100, layer1y + 50*i);
+            context.lineTo(350, layer2y + 50*j);
+            context.strokeStyle = "black";
+            context.lineWidth = inputWeights[i-1][j-1] + 1 + inputs[i-1];
+            context.stroke();
+            context.closePath();
+        }
+    }
+    // hidden nodes
+    for (let i = 1; i <= outputWeights.length; i++) {
+        context.beginPath();
+        context.arc(350, layer2y + 50*i, 10, 0, 2 * Math.PI);
+        context.fillStyle = "blue";
+        context.fill();
+        context.closePath();
+        // weights from hidden layer to output layer
+        for (let j = 1; j <= 3; j++) {
+            context.beginPath();
+            context.moveTo(350, layer2y + 50*i);
+            context.lineTo(600, layer3y + 50*j);
+            context.strokeStyle = "black";
+            context.lineWidth = outputWeights[i-1][j-1] + 1 + prediction[j-1];
+            context.stroke();
+            context.closePath();
+        }
+    }
+    // output nodes
+    for (let i = 1; i <= 3; i++) {
+        context.beginPath();
+        context.arc(600, layer3y + 50*i, 10, 0, 2 * Math.PI);
+        context.fillStyle = "blue";
+        context.fill();
+        context.closePath();
+        // output label
+        context.font = `18px sans-serif`;
+        context.fillStyle = "black";
+        context.fillText(prediction[i-1].toFixed(2), 630, layer3y + 5 + 50*i);
+        context.fillText(outputLabels[i-1], 680, layer3y + 5 + 50*i);
+    }
+}
+````
 
 
 
