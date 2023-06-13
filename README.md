@@ -1,4 +1,6 @@
 # Genetic Neural Network
+Access the game through this link: https://github.com/alexaoliveira2000/genetic-mario
+
 This project was developed as a way for me to learn how to implement feedforward neural networks and how to train it to become expert at a given game. In this document, I show you the game I created and the logic of the NN evolution.
 
 Before we start, in this document I use some terminology that is specific for Genetic Neural Networks, and so here's a list of these terms in case you don't follow:
