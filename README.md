@@ -232,7 +232,7 @@ Let's look at an example with oversimplified neural networks (array of 5 weights
 On this example, the solution would be found in few iterations because of the neural networks size, but in a real neural network there would be hundreds, thousands or even millions of weights that could be changed.
 
 This example illustrates some important aspects of training neural networks.
-- Bigger populations (or generations) are good because we can test several solutions and have a bigger diversity; the downside is it takes time to test them and many agents can have similar traits which we do not want; it can also take time more to reach the solution comparing to smaller populations;
+- Bigger populations (or generations) are good because we can test several solutions and have a bigger diversity; the downside is it takes time to test them and many agents can have similar traits which we do not want; it can also take more time to reach the solution comparing to smaller populations;
 - The perfect mutation rate can be hard to find and dependes on the problem. We want the mutation to have a significant impact on a neural network, but not too much to the point it forgets learned patterns;
 - Crossover is a way to mimic real life reproduction, mixing traits of both parents; in real life the average crossover rate is about 0.5, but here we have the power to adjust the way we want it to, trying to keep alive good traits that are found.
 
