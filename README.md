@@ -198,7 +198,7 @@ Let's look at an example with oversimplified neural networks (array of 5 weights
 
 | Agent | Neural Network | Score | Fitness
 |-|-|-|-|
-| 1 | [1, 4, 3, 0, 5] | 0 | 0.00
+| 1 | [1, 4, 3, 0, 5] | 1 | 0.20
 | 2 | [3, 2, 0, 0, 3] | 0 | 0.00
 | 3 | [4, 5, 1, 2, 4] | 1 | 0.20
 | 4 | [3, 1, 3, 0, 2] | 2 | 0.40
@@ -213,7 +213,7 @@ Let's look at an example with oversimplified neural networks (array of 5 weights
 
 | Agents | Crossover Rate | New Neural Network
 |-|-|-|
-| 1 & 4 | 0.4 / (0.4 + 0.0 + 0.01) = 0.97 | [3, 1, 3, 0, 5]
+| 1 & 4 | 0.4 / (0.4 + 0.2 + 0.01) = 0.66 | [1, 4, 3, 0, 2]
 | 2 & 4 | 0.4 / (0.4 + 0.0 + 0.01) = 0.97 | [3, 1, 3, 0, 5]
 | 3 & 4 | 0.4 / (0.4 + 0.2 + 0.01) = 0.66 | [4, 1, 3, 0, 4]
 | 4 & 4 | 0.4 / (0.4 + 0.4 + 0.01) = 0.49 | [3, 1, 3, 0, 2]
@@ -222,7 +222,7 @@ Let's look at an example with oversimplified neural networks (array of 5 weights
 
 | Agent | Neural Network | Mutated Neural Network
 |-|-|-|
-| 1 | [3, 1, 3, 0, 5] | [3, 1, 3, 1, 5]
+| 1 | [1, 4, 3, 0, 2] | [1, 4, 1, 0, 2]
 | 2 | [3, 1, 3, 0, 5] | [5, 1, 3, 1, 5]
 | 3 | [4, 1, 3, 0, 4] | [4, 1, 3, 2, 4]
 | 4 | [3, 1, 3, 0, 2] | [3, 5, 3, 0, 2]
