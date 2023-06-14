@@ -25,11 +25,10 @@ class Item {
         this.context.fillStyle = this.color;
         this.context.fillRect(this.x, this.y, this.width, this.height);
     }
-
 }
 
 class Agent extends Item {
-    constructor(context, x, y, width, height, color, brain, generation) {
+    constructor(context, x, y, width, height, color, brain, generation, mutationRate, hiddenNodes) {
         super(context, x, y, width, height, color);
         this.velocity = 0;
         this.action = Action.STAND;
@@ -38,14 +37,14 @@ class Agent extends Item {
         this.generation = generation;
         if (brain instanceof NeuralNetwork) {
             this.brain = brain.copy();
-            this.brain.mutate(0.1);
+            this.brain.mutate(mutationRate);
         } else {
-            this.brain = new NeuralNetwork(4, 6, 3);
+            this.brain = new NeuralNetwork(4, hiddenNodes || 6, 3);
         }
     }
 
     calculateFitness() {
-        this.fitness = this.score / 100;
+        this.fitness = (this.score / 30).toFixed(2);
     }
 
     collided(item) {
@@ -99,15 +98,32 @@ class Agent extends Item {
         this.height = 100;
         this.y = 300;
     }
-
 }
 
 class Population {
-    constructor(size, context) {
+    constructor(size, context, mutationRate, hiddenNodes) {
         this.size = size;
         this.members = [];
+        this.mutationRate = mutationRate;
+        this.hiddenNodes = hiddenNodes;
         for (let i = 1; i <= size; i++)
-            this.members.push(new Agent(context, 100, 300, 50, 100, "red", null, 1));
+            this.members.push(new Agent(context, 100, 300, 50, 100, "red", null, 1, this.mutationRate, this.hiddenNodes));
+    }
+
+    performCrossover() {
+        let bestAgent = this.members[0];
+        for (const agent of this.members) {
+            if (agent.fitness > bestAgent.fitness)
+                bestAgent = agent;
+        }
+        let newMembers = []
+        for (const agent of this.members) {
+            let rate = bestAgent.fitness ? bestAgent.fitness / (bestAgent.fitness + agent.fitness + 0.01) : 0.5;
+            agent.brain.crossover(bestAgent.brain.model, rate)
+            let newAgent = new Agent(agent.context, agent.x, agent.y, agent.width, agent.height, agent.color, agent.brain, agent.generation + 1, this.mutationRate, this.hiddenNodes);
+            newMembers.push(newAgent);
+        }
+        this.members = newMembers;
     }
 
     nextGeneration() {
@@ -126,18 +142,13 @@ class Population {
     }
 
     normalizeFitness() {
-        for (let i = 0; i < this.members.length; i++) {
+        for (let i = 0; i < this.members.length; i++)
             this.members[i].score = Math.pow(this.members[i].score, 2);
-        }
-
         let sum = 0;
-        for (let i = 0; i < this.members.length; i++) {
+        for (let i = 0; i < this.members.length; i++)
             sum += this.members[i].score;
-        }
-
-        for (let i = 0; i < this.members.length; i++) {
+        for (let i = 0; i < this.members.length; i++)
             this.members[i].fitness = this.members[i].score / sum;
-        }
     }
 
     poolSelection() {

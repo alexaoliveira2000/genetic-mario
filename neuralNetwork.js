@@ -1,5 +1,4 @@
 class NeuralNetwork {
-
     constructor(inputs, hiddenUnits, outputs, model = {}) {
         this.input_nodes = inputs;
         this.hidden_nodes = hiddenUnits;
@@ -29,7 +28,6 @@ class NeuralNetwork {
     randomGaussian() {
         let mean = 0;
         let stdDev = 1;
-
         let u = 0, v = 0;
         while (u === 0) u = Math.random();
         while (v === 0) v = Math.random();
@@ -46,7 +44,7 @@ class NeuralNetwork {
                 let shape = weights[i].shape;
                 let values = tensor.dataSync().slice();
                 for (let j = 0; j < values.length; j++) {
-                    if (Math.random(1) < rate) {
+                    if (Math.random() < rate) {
                         let w = values[j];
                         values[j] = w + this.randomGaussian();
                     }
@@ -56,6 +54,37 @@ class NeuralNetwork {
             }
             this.model.setWeights(mutatedWeights);
         });
+    }
+
+    crossover(model, crossoverProbability) {
+        let tensorsModel1 = this.model.getWeights();
+        let tensorsModel2 = model.getWeights();
+        // for each tensor
+        for (let i = 0; i < tensorsModel1.length; i++) {
+            let nodesWeightsModel1 = tensorsModel1[i].arraySync();
+            let nodesWeightsModel2 = tensorsModel2[i].arraySync();
+            // if it is a bias tensor
+            if (tensorsModel1[i].name.includes("bias")) {
+                // for each bias
+                for (let k = 0; k < nodesWeightsModel1.length; k++)
+                    if (Math.round(Math.random()))
+                    nodesWeightsModel1[k] = nodesWeightsModel1[k];
+                tensorsModel1[i] = tf.tensor(nodesWeightsModel1)
+            } else {
+                // for each node connections
+                for (let j = 0; j < nodesWeightsModel1.length; j++) {
+                    let nodeWeightsModel1 = nodesWeightsModel1[j];
+                    let nodeWeightsModel2 = nodesWeightsModel2[j];
+                    // for each weight
+                    for (let k = 0; k < nodeWeightsModel1.length; k++)
+                        if (Math.random() < crossoverProbability)
+                            nodeWeightsModel1[k] = nodeWeightsModel2[k];
+                }
+                tensorsModel1[i] = tf.tensor2d(nodesWeightsModel1)
+            }
+        }
+        this.model.setWeights(tensorsModel1);
+        return this.model;
     }
 
     predict(inputs) {

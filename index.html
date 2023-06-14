@@ -2,34 +2,52 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Environment</title>
+    <title>Genetic Mario</title>
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.0.0/dist/tf.min.js"></script>
     <script src="/neuralNetwork.js"></script>
     <script src="/classes.js"></script>
     <script src="/environment.js"></script>
-    <!--<script type="module" src="/script.js"></script>-->
 </head>
 <body>
-    <div style="width: 1000px; padding: 10px;">
-        <div style="display: flex; justify-content: center">
-            <span id="score" style="font-size: 20px; margin: 20px;">Score: 0</span>
-            <span id="generation" style="font-size: 20px; margin: 20px;">Generation: 0</span>
-            <span id="agent" style="font-size: 20px; margin: 20px;">Agent: 0</span>
+    <div style="padding: 10px;">
+        <div style="display: flex; padding-bottom: 10px">
+            <label id="score" style="padding-right: 10px;">Score: 0</label>
+            <label id="generation" style="padding-right: 10px;">Generation: 0</label>
+            <label id="agent" style="padding-right: 10px;">Agent: 0</label>
         </div>
+        <div style="padding-right: 10px;">
+            <label style="margin-right: 66px">Generations:</label>
+            <input style="width: 70px" type="number" id="train_generations" min=1 max=100 value=50 required>
+        </div>
+        <div style="padding-right: 10px;">
+            <label style="margin-right: 98px">Agents:</label>
+            <input style="width: 70px" type="number" id="train_agents" min=1 max=50 value=10 required>
+        </div>
+        <div style="padding-right: 10px;">
+            <label style="margin-right: 10px">Hidden Layer Nodes:</label>
+            <input style="width: 70px" type="number" id="train_nodes" min=4 max=10 value=6 required>
+        </div>
+        <div style="padding-right: 10px;">
+            <label style="margin-right: 52px">Mutation Rate:</label>
+            <input style="width: 70px" type="number" id="train_rate" min=0.00 max=0.99 value=0.01 step=.01 required>
+        </div>
+        <div style="padding-right: 10px;">
+            <label style="margin-right: 22px">Perform Crossover:</label>
+            <label>Yes</label>
+            <input id="train_crossover_yes" type="radio" name="crossover" checked>
+            <label>No</label>
+            <input id="train_crossover_no" type="radio" name="crossover">
+        </div>
+    </div>
+    <div style="display:inline-flexbox; display: flex; flex-direction: row; align-items: center;">
+        <canvas id="canvas" width="1000" height="500" style="border: 3px solid black;"></canvas>
+        <canvas id="model" width="800" height="500"></canvas>
     </div>
     <div>
-        <canvas id="canvas" width="1000" height="500" style="padding-bottom: 10px"></canvas>
-        <canvas id="model" width="800" height="700"></canvas>
+        <button id="play">Play</button>
+        <button id="reset">Reset</button>
+        <button id="train">Train</button>
     </div>
-    <div style="display: inline-flex; width: 1000px">
-        <div>
-            <div>
-                <button id="play">Play</button>
-                <button id="reset">Reset</button>
-                <button id="train">Train</button>
-            </div>
-            <div id="train_table" style="display: inline-flex;"></div>
-        </div>
-    </div>
+    <div id="train_table" style="width:1050px; display: flex; flex-wrap: wrap;"></div>
 </body>
 </html>
