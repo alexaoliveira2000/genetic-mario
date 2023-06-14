@@ -120,7 +120,7 @@ By instance, if the first parent has 0.25 of fitness and the second one has 0.5,
 
 $rate$ = $parent2.fitness$ $/$ $(parent1.fitness$ $+$ $parent2.fitness$ $+$ $0.01$)
 
-The ""$+$ $0.01$"" on the formula is to prevent the complete crossover of the second parent to the first one in case the second parent fitness is 0 (100% crossover). Also, this formula just doesn't make sense if both fitnesses are 0, and so in this case the rate is just 0.5 (50%):
+The "$+$ $0.01$" on the formula is to prevent the complete crossover of the second parent to the first one in case the second parent fitness is 0 (100% crossover). Also, this formula just doesn't make sense if both fitnesses are 0, and so in this case the rate is just 0.5 (50%):
 ```` js
 performCrossover() {
         let bestAgent = this.members[0];
