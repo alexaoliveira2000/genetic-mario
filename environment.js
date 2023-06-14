@@ -9,7 +9,8 @@ const obstacleTypes = [
     { id: 1, y: 300, width: 50, height: 100 },
     { id: 2, y: 350, width: 50, height: 50 },
     //{ id: 3, y: 0, width: 50, height: 280 },
-    { id: 4, y: 0, width: 50, height: 330 }
+    { id: 4, y: 0, width: 50, height: 330 },
+    { id: 5, y: 180, width: 100, height: 150 }
 ]
 
 // html elements
@@ -28,7 +29,10 @@ let hasCollided = function (agent, obstacles) {
 let createObstacles = function (number) {
     let result = []
     for (let x = 900; x <= 900 + 500 * (number - 1); x += 500) {
-        let obstacleType = obstacleTypes[Math.floor(Math.random() * obstacleTypes.length)];
+        let obstacleType;
+        do {
+            obstacleType = obstacleTypes[Math.floor(Math.random() * obstacleTypes.length)];
+        } while (result.length != 0 && obstacleType.id == result[result.length-1].id);
         let obstacle = new Item(context, x, obstacleType.y, obstacleType.width, obstacleType.height, "black");
         result.push(obstacle);
     }
@@ -42,7 +46,7 @@ let updateObstacles = function (agent, obstacles) {
         let obstacleType;
         do {
             obstacleType = obstacleTypes[Math.floor(Math.random() * obstacleTypes.length)];
-        } while (obstacleType.id == obstacles[0].id && obstacleType.id == obstacles[0].id);
+        } while (obstacleType.id == obstacles[1].id);
         let obstacle = new Item(context, 1400, obstacleType.y, obstacleType.width, obstacleType.height, "black");
         obstacles.push(obstacle)
         agent.score += 2;
@@ -326,10 +330,8 @@ var train = async function () {
             agent.calculateFitness();
             addGenerationTable(generationTable, agent, agentNumber);
         }
-        if (doCrossover)
-            population.performCrossover();
-        else
-            population.nextGeneration();
+        population.normalizeFitness();
+        population.members = doCrossover ? population.performCrossover() : population.nextGeneration();
     }
 }
 

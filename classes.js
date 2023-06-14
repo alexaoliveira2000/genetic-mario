@@ -111,49 +111,57 @@ class Population {
     }
 
     performCrossover() {
+        let newMembers = []
         let bestAgent = this.members[0];
-        for (const agent of this.members) {
+        for (const agent of this.members)
             if (agent.fitness > bestAgent.fitness)
                 bestAgent = agent;
-        }
-        let newMembers = []
         for (const agent of this.members) {
-            let rate = bestAgent.fitness ? bestAgent.fitness / (bestAgent.fitness + agent.fitness + 0.01) : 0.5;
-            agent.brain.crossover(bestAgent.brain.model, rate)
-            let newAgent = new Agent(agent.context, agent.x, agent.y, agent.width, agent.height, agent.color, agent.brain, agent.generation + 1, this.mutationRate, this.hiddenNodes);
-            newMembers.push(newAgent);
+            if (agent.fitness == 1) {
+                agent.generation++;
+                newMembers.push(agent);
+            } else {
+                //let rate = bestAgent.fitness ? bestAgent.fitness / (bestAgent.fitness + agent.fitness + 0.01) : 0.5;
+                let rate = 0.5;
+                agent.brain.crossover(bestAgent.brain.model, rate);
+                let newAgent = new Agent(agent.context, agent.x, agent.y, agent.width, agent.height, agent.color, agent.brain, agent.generation + 1, this.mutationRate, this.hiddenNodes);
+                newMembers.push(newAgent);
+            }
         }
-        this.members = newMembers;
+        return newMembers;
     }
 
     nextGeneration() {
-        this.normalizeFitness();
-        this.members = this.generate();
-    }
-
-    generate() {
         let newMembers = [];
+        for (const member of this.members)
+            if (member.fitness == 1) {
+                member.score = 0;
+                newMembers.push(member);
+            }
+        let poolMembers = this.members.filter(member => member.fitness != 1);
         for (let i = 0; i < this.members.length; i++) {
-            let member = this.poolSelection(this.members);
+            let member = this.poolSelection(poolMembers);
             newMembers[i] = member;
         }
-        this.members = newMembers;
         return newMembers;
     }
 
     normalizeFitness() {
-        for (let i = 0; i < this.members.length; i++)
-            this.members[i].score = Math.pow(this.members[i].score, 2);
+        for (const member of this.members)
+            if (member.fitness != 1)
+                member.score = Math.pow(member.score, 2);
         let sum = 0;
-        for (let i = 0; i < this.members.length; i++)
-            sum += this.members[i].score;
-        for (let i = 0; i < this.members.length; i++)
-            this.members[i].fitness = this.members[i].score / sum;
+        for (const member of this.members)
+            if (member.fitness != 1)
+                sum += member.score;
+        for (const member of this.members)
+            if (member.fitness != 1)
+            member.fitness = member.score / sum;
     }
 
-    poolSelection() {
+    poolSelection(members) {
         let pool = [];
-        this.members.forEach((member) => {
+        members.forEach((member) => {
             let fitness = Math.floor(member.fitness * 100) || 1;
             for (let i = 0; i < fitness; i++) {
                 pool.push(member);
