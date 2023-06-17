@@ -10,9 +10,9 @@ For the training in-game, there are some parameters you can change. Some importa
 | Environment | All the information that the game itself provides. It is the context where the agent operates. |
 | Agent | Autonomous entity that interacts with the environment (game). Processes inputs from the environment and makes decisions based on learned patterns. It has a brain  (neural network) which is shown on the game.  |
 | Fitness | It is a measure (percentage) of how well the agent performed. |
-| Generation | A group of agents that are going to be tested in a row and then selected to a new generation based on each agent's fitness (hopefully a more refined one). |
+| Generation | A group of agents that are going to be tested in a row and then selected to a new generation based on each agent's fitness. |
 | Mutation Rate | When a new agent is created from another one (child), the agent's brain is "mutated" at a rate. The bigger the rate, the more the brain changes.
-| Crossover | When two agents brains are put together to generate two new brains (children), the new brains is a mix of both parents, combining traits/patterns. This is called crossover. The children have the exact opposite genes from one another. |
+| Crossover | When two agents brains are put together to generate two new brains (children), those new brains are a mix of both parents, combining traits/patterns. This is called crossover. The children have the exact opposite genes from one another. |
 | Crossover Rate | Percentage of the first parent brain that is going to be on the first child brain.
 
 ## Neural Network
