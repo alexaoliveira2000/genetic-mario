@@ -126,8 +126,8 @@ The workflow of the evolution process with crossover is as follows:
 3. Create "selection pool";
 4. While new population hasn't been fully populated:
 5. Pick 2 agents from the pool;
-7. Perform crossover with them - 2 children are generated;
-9. Perform mutations for each new child;
-10. Put children in the new generation;
+7.          Perform crossover with them - 2 children are generated;
+9.          Perform mutations for each new child;
+10.         Put children in the new generation;
 11. Back to step 1.
 There are many more aspects of training neural networks a little more in-depth, such has the number of layers (and number of nodes on each one of them), activation functions, weights normalization and much more that will not be covered here.
