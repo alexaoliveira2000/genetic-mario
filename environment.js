@@ -10,7 +10,7 @@ const obstacleTypes = [
     { id: 2, y: 350, width: 50, height: 50 },
     //{ id: 3, y: 0, width: 50, height: 280 },
     { id: 4, y: 0, width: 50, height: 330 },
-    { id: 5, y: 180, width: 100, height: 150 }
+    { id: 5, y: 180, width: 150, height: 150 }
 ]
 
 // html elements
@@ -27,28 +27,27 @@ let hasCollided = function (agent, obstacles) {
 
 // function to create a number of random obstacles
 let createObstacles = function (number) {
-    let result = []
-    for (let x = 900; x <= 900 + 500 * (number - 1); x += 500) {
-        let obstacleType;
-        do {
-            obstacleType = obstacleTypes[Math.floor(Math.random() * obstacleTypes.length)];
-        } while (result.length != 0 && obstacleType.id == result[result.length-1].id);
-        let obstacle = new Item(context, x, obstacleType.y, obstacleType.width, obstacleType.height, "black");
-        result.push(obstacle);
-    }
-    return result;
+    let obstacles = []
+    for (let i = 0; i < number; i++)
+        addObstacle(obstacles);
+    return obstacles;
+}
+
+let addObstacle = function (obstacles) {
+    let x = obstacles.length == 0 ? 900 : obstacles[obstacles.length-1].x + obstacles[obstacles.length-1].width + 500;
+    let obstacleType;
+    do {
+        obstacleType = obstacleTypes[Math.floor(Math.random() * obstacleTypes.length)];
+    } while (obstacles.length != 0 && obstacleType.id == obstacles[obstacles.length-1].id);
+    let obstacle = new Item(context, x, obstacleType.y, obstacleType.width, obstacleType.height, "black", obstacleType.id);
+    obstacles.push(obstacle);
 }
 
 // function to update the given obstacles array
 let updateObstacles = function (agent, obstacles) {
     if (obstacles[0].x + obstacles[0].width < 0) {
-        obstacles.shift()
-        let obstacleType;
-        do {
-            obstacleType = obstacleTypes[Math.floor(Math.random() * obstacleTypes.length)];
-        } while (obstacleType.id == obstacles[1].id);
-        let obstacle = new Item(context, 1400, obstacleType.y, obstacleType.width, obstacleType.height, "black");
-        obstacles.push(obstacle)
+        obstacles.shift();
+        addObstacle(obstacles);
         agent.score += 2;
     }
     return obstacles;
@@ -72,33 +71,33 @@ let updateGame = function (agent, obstacles, number) {
 }
 
 // function to update the shown neural network
-let updateModel = function (context, model, prediction, inputs) {
+let updateModel = function (model, prediction, inputs) {
     // function to draw a node at a given position
     let drawNode = function (x, y) {
-        context.beginPath();
-        context.arc(x, y, 10, 0, 2 * Math.PI);
-        context.fillStyle = "blue";
-        context.fill();
-        context.closePath();
+        modelContext.beginPath();
+        modelContext.arc(x, y, 10, 0, 2 * Math.PI);
+        modelContext.fillStyle = "blue";
+        modelContext.fill();
+        modelContext.closePath();
     }
 
     // function to draw a weight at a given position
     let drawWeight = function (x1, y1, x2, y2, weight) {
-        context.beginPath();
-        context.moveTo(x1, y1);
-        context.lineTo(x2, y2);
-        context.strokeStyle = "black";
-        context.lineWidth = weight;
-        context.stroke();
-        context.closePath();
+        modelContext.beginPath();
+        modelContext.moveTo(x1, y1);
+        modelContext.lineTo(x2, y2);
+        modelContext.strokeStyle = "black";
+        modelContext.lineWidth = weight;
+        modelContext.stroke();
+        modelContext.closePath();
     }
 
     // function to draw an output prediction and label
     let drawOutputLabel = function (x, y, probability, text) {
-        context.font = `18px sans-serif`;
-        context.fillStyle = "black";
-        context.fillText(probability, x, y);
-        context.fillText(text, x + 50, y);
+        modelContext.font = `18px sans-serif`;
+        modelContext.fillStyle = "black";
+        modelContext.fillText(probability, x, y);
+        modelContext.fillText(text, x + 50, y);
     }
 
     let outputLabels = ["stand", "jump", "crouch"];
@@ -110,7 +109,7 @@ let updateModel = function (context, model, prediction, inputs) {
     let layer2Position = 225 - 25 * outputWeights.length;
     let layer3Position = 150;
 
-    context.clearRect(0, 0, 800, 700);
+    modelContext.clearRect(0, 0, 800, 700);
 
     // input nodes
     for (let i = 1; i <= 4; i++) {
@@ -270,7 +269,6 @@ var play = async function () {
 }
 
 var train = async function () {
-
     // check inputs
     trainGenerations = document.getElementById("train_generations");
     trainAgents = document.getElementById("train_agents");
@@ -278,7 +276,7 @@ var train = async function () {
     trainRate = document.getElementById("train_rate");
     trainCrossoverYes = document.getElementById("train_crossover_yes");
     trainCrossoverNo = document.getElementById("train_crossover_no");
-    if (trainGenerations.value < 1 || trainGenerations.value > 100)
+    if (trainGenerations.value < 1 || trainGenerations.value > 500)
         return
     if (trainAgents.value < 1 || trainAgents.value > 50)
         return
@@ -286,7 +284,7 @@ var train = async function () {
         return
     if (trainRate.value < 0.00 || trainRate.value > 0.99)
         return
-    let doCrossover = trainCrossoverYes.checked;
+    let doCrossover = trainCrossoverYes.checked && trainAgents.value > 1;
 
     // disable inputs
     trainGenerations.disabled = true;
@@ -311,18 +309,18 @@ var train = async function () {
             let agent = population.members[agentNumber - 1];
             let obstacles = createObstacles(3);
             floor.show();
-            while (training && !hasCollided(agent, obstacles) && agent.score < 30) {
+            while (training && !hasCollided(agent, obstacles)) {
+                if (agent.score == 30)
+                    return
                 // make prediction
                 let closestObject = obstacles[0];
                 let inputs = [closestObject.x, closestObject.y, closestObject.width, closestObject.height];
                 inputs = normalizeInputs(inputs);
                 let prediction = agent.brain.predict(inputs);
                 predictedAction(agent, prediction)
-
                 // update environment
-                updateModel(modelContext, agent.brain.model, prediction, inputs)
+                updateModel(agent.brain.model, prediction, inputs)
                 updateGame(agent, obstacles, agentNumber);
-
                 // wait between frames
                 await new Promise(r => setTimeout(r, TIME));
             }
@@ -330,8 +328,7 @@ var train = async function () {
             agent.calculateFitness();
             addGenerationTable(generationTable, agent, agentNumber);
         }
-        population.normalizeFitness();
-        population.members = doCrossover ? population.performCrossover() : population.nextGeneration();
+        population.members = population.nextGeneration(doCrossover);
     }
 }
 

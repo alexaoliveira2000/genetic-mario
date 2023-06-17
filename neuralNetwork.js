@@ -67,9 +67,13 @@ class NeuralNetwork {
             if (tensorsModel1[i].name.includes("bias")) {
                 // for each bias
                 for (let k = 0; k < nodesWeightsModel1.length; k++)
-                    if (Math.round(Math.random()))
-                    nodesWeightsModel1[k] = nodesWeightsModel1[k];
-                tensorsModel1[i] = tf.tensor(nodesWeightsModel1)
+                    if (Math.random() < crossoverProbability) {
+                        let temp = nodesWeightsModel1[k];
+                        nodesWeightsModel1[k] = nodesWeightsModel2[k];
+                        nodesWeightsModel2[k] = temp;
+                    }
+                tensorsModel1[i] = tf.tensor(nodesWeightsModel1);
+                tensorsModel2[i] = tf.tensor(nodesWeightsModel2);
             } else {
                 // for each node connections
                 for (let j = 0; j < nodesWeightsModel1.length; j++) {
@@ -77,14 +81,19 @@ class NeuralNetwork {
                     let nodeWeightsModel2 = nodesWeightsModel2[j];
                     // for each weight
                     for (let k = 0; k < nodeWeightsModel1.length; k++)
-                        if (Math.random() < crossoverProbability)
+                        if (Math.random() < crossoverProbability) {
+                            let temp = nodeWeightsModel1[k];
                             nodeWeightsModel1[k] = nodeWeightsModel2[k];
+                            nodeWeightsModel2[k] = temp;
+                        }
                 }
-                tensorsModel1[i] = tf.tensor2d(nodesWeightsModel1)
+                tensorsModel1[i] = tf.tensor2d(nodesWeightsModel1);
+                tensorsModel2[i] = tf.tensor2d(nodesWeightsModel2);
             }
         }
         this.model.setWeights(tensorsModel1);
-        return this.model;
+        model.setWeights(tensorsModel2);
+        return model;
     }
 
     predict(inputs) {

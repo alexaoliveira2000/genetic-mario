@@ -5,13 +5,14 @@ const Action = {
 }
 
 class Item {
-    constructor(context, x, y, width, height, color) {
+    constructor(context, x, y, width, height, color, id) {
         this.context = context;
         this.x = x;
         this.y = y;
         this.width = width;
         this.height = height;
         this.color = color;
+        this.id = id;
     }
 
     show() {
@@ -110,56 +111,38 @@ class Population {
             this.members.push(new Agent(context, 100, 300, 50, 100, "red", null, 1, this.mutationRate, this.hiddenNodes));
     }
 
-    performCrossover() {
-        let newMembers = []
-        let bestAgent = this.members[0];
-        for (const agent of this.members)
-            if (agent.fitness > bestAgent.fitness)
-                bestAgent = agent;
-        for (const agent of this.members) {
-            if (agent.fitness == 1) {
-                agent.generation++;
-                newMembers.push(agent);
-            } else {
-                //let rate = bestAgent.fitness ? bestAgent.fitness / (bestAgent.fitness + agent.fitness + 0.01) : 0.5;
-                let rate = 0.5;
-                agent.brain.crossover(bestAgent.brain.model, rate);
-                let newAgent = new Agent(agent.context, agent.x, agent.y, agent.width, agent.height, agent.color, agent.brain, agent.generation + 1, this.mutationRate, this.hiddenNodes);
+    nextGeneration(doCrossover) {
+        this.normalizeFitness();
+        let newMembers = [];
+        let pool = this.createPool(this.members);
+        while (newMembers.length < this.members.length) {
+            let selectedAgent = this.poolSelection(pool);
+            if (doCrossover) {
+                let crossoverAgent = this.poolSelection(pool, selectedAgent);
+                selectedAgent.brain.crossover(crossoverAgent.brain.model, 0.5);
+                let newCrossoverAgent = new Agent(crossoverAgent.context, crossoverAgent.x, crossoverAgent.y, crossoverAgent.width, crossoverAgent.height, crossoverAgent.color, crossoverAgent.brain, crossoverAgent.generation + 1);
+                newMembers.push(newCrossoverAgent);
+            }
+            if (newMembers.length < this.members.length) {
+                let newAgent = new Agent(selectedAgent.context, selectedAgent.x, selectedAgent.y, selectedAgent.width, selectedAgent.height, selectedAgent.color, selectedAgent.brain, selectedAgent.generation + 1);
                 newMembers.push(newAgent);
             }
         }
         return newMembers;
     }
 
-    nextGeneration() {
-        let newMembers = [];
-        for (const member of this.members)
-            if (member.fitness == 1) {
-                member.score = 0;
-                newMembers.push(member);
-            }
-        let poolMembers = this.members.filter(member => member.fitness != 1);
-        for (let i = 0; i < this.members.length; i++) {
-            let member = this.poolSelection(poolMembers);
-            newMembers[i] = member;
-        }
-        return newMembers;
-    }
-
     normalizeFitness() {
         for (const member of this.members)
-            if (member.fitness != 1)
-                member.score = Math.pow(member.score, 2);
+            member.score = Math.pow(member.score, 2);
         let sum = 0;
         for (const member of this.members)
-            if (member.fitness != 1)
-                sum += member.score;
+            sum += member.score;
+        sum = sum || 1;
         for (const member of this.members)
-            if (member.fitness != 1)
             member.fitness = member.score / sum;
     }
 
-    poolSelection(members) {
+    createPool(members) {
         let pool = [];
         members.forEach((member) => {
             let fitness = Math.floor(member.fitness * 100) || 1;
@@ -167,8 +150,15 @@ class Population {
                 pool.push(member);
             }
         });
-        let selectedMember = pool[Math.floor(Math.random() * pool.length)];
-        return new Agent(selectedMember.context, selectedMember.x, selectedMember.y, selectedMember.width, selectedMember.height, selectedMember.color, selectedMember.brain, selectedMember.generation + 1);
+        return pool;
+    }
+
+    poolSelection(pool, member) {
+        let selectedMember;
+        do {
+            selectedMember = pool[Math.floor(Math.random() * pool.length)];
+        } while (selectedMember == member);
+        return selectedMember;
     }
 
 }
