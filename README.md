@@ -130,4 +130,5 @@ The workflow of the evolution process with crossover is as follows:
 - Perform mutations for each new child;
 - Put children in the new generation;
 5. Back to step 1.
+
 There are many more aspects of training neural networks a little more in-depth, such has the number of layers (and number of nodes on each one of them), activation functions, weights normalization and much more that will not be covered here.
